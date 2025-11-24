@@ -93,7 +93,7 @@ Install the following plugins through **Manage Jenkins → Manage Plugins → Av
 Manage Jenkins → Manage Plugins → Available tab
 Search for each plugin → Check the box → Click "Install without restart"
 ```
-
+ok
 ## 🚀 Creating the Pipeline
 
 ### Method 1: Pipeline from SCM (Recommended)
