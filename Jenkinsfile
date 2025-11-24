@@ -45,6 +45,31 @@ pipeline {
             }
         }
         
+        // OPTIONAL: Uncomment this stage to push images to Docker Hub
+        // To use this stage:
+        // 1. Create a Docker Hub account at https://hub.docker.com
+        // 2. In Jenkins, go to: Manage Jenkins → Manage Credentials
+        // 3. Add credentials: Username with password
+        //    - ID: dockerhub-credentials
+        //    - Username: your Docker Hub username
+        //    - Password: your Docker Hub password or access token
+        // 4. Update APP_NAME to include your Docker Hub username (e.g., 'yourusername/jenkins-demo-app')
+        // 5. Uncomment the stage below
+        //
+        // stage('Push to Docker Hub') {
+        //     steps {
+        //         echo 'Pushing Docker image to Docker Hub...'
+        //         script {
+        //             // Login to Docker Hub using credentials stored in Jenkins
+        //             docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+        //                 // Push both the build-specific and latest tags
+        //                 docker.image("${APP_NAME}:${BUILD_NUMBER}").push()
+        //                 docker.image("${APP_NAME}:latest").push()
+        //             }
+        //         }
+        //     }
+        // }
+        
         stage('Deploy to Staging') {
             when {
                 branch 'develop'
@@ -71,7 +96,7 @@ pipeline {
         
         stage('Deploy to Production') {
             when {
-                branch 'main'
+                branch 'master'
             }
             steps {
                 echo 'Deploying to production environment...'
