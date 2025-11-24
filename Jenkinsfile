@@ -33,21 +33,6 @@ pipeline {
                 echo 'Running tests with coverage...'
                 bat 'npm test'
             }
-            post {
-                always {
-                    // Publish test results (optional - requires jest-junit)
-                    // junit 'coverage/junit.xml'
-                    // Publish coverage report (optional - requires HTML Publisher plugin)
-                    // publishHTML([
-                    //     allowMissing: false,
-                    //     alwaysLinkToLastBuild: true,
-                    //     keepAll: true,
-                    //     reportDir: 'coverage/lcov-report',
-                    //     reportFiles: 'index.html',
-                    //     reportName: 'Coverage Report'
-                    // ])
-                }
-            }
         }
         
         stage('Build Docker Image') {
