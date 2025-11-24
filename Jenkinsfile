@@ -17,35 +17,35 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo 'Installing Node.js dependencies...'
-                sh 'npm ci'
+                bat 'npm ci'
             }
         }
         
         stage('Lint') {
             steps {
                 echo 'Running ESLint...'
-                sh 'npm run lint'
+                bat 'npm run lint'
             }
         }
         
         stage('Test') {
             steps {
                 echo 'Running tests with coverage...'
-                sh 'npm test'
+                bat 'npm test'
             }
             post {
                 always {
-                    // Publish test results
-                    junit 'coverage/junit.xml'
-                    // Publish coverage report
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'coverage/lcov-report',
-                        reportFiles: 'index.html',
-                        reportName: 'Coverage Report'
-                    ])
+                    // Publish test results (optional - requires jest-junit)
+                    // junit 'coverage/junit.xml'
+                    // Publish coverage report (optional - requires HTML Publisher plugin)
+                    // publishHTML([
+                    //     allowMissing: false,
+                    //     alwaysLinkToLastBuild: true,
+                    //     keepAll: true,
+                    //     reportDir: 'coverage/lcov-report',
+                    //     reportFiles: 'index.html',
+                    //     reportName: 'Coverage Report'
+                    // ])
                 }
             }
         }
@@ -68,17 +68,17 @@ pipeline {
                 echo 'Deploying to staging environment...'
                 script {
                     // Stop existing container if running
-                    sh '''
-                        docker stop ${APP_NAME}-staging || true
-                        docker rm ${APP_NAME}-staging || true
+                    bat '''
+                        docker stop %APP_NAME%-staging || exit 0
+                        docker rm %APP_NAME%-staging || exit 0
                     '''
                     // Run new container
-                    sh '''
-                        docker run -d \
-                            --name ${APP_NAME}-staging \
-                            -p 3001:3000 \
-                            -e NODE_ENV=staging \
-                            ${APP_NAME}:${BUILD_NUMBER}
+                    bat '''
+                        docker run -d ^
+                            --name %APP_NAME%-staging ^
+                            -p 3001:3000 ^
+                            -e NODE_ENV=staging ^
+                            %APP_NAME%:%BUILD_NUMBER%
                     '''
                 }
             }
@@ -93,17 +93,17 @@ pipeline {
                 input message: 'Deploy to production?', ok: 'Deploy'
                 script {
                     // Stop existing container if running
-                    sh '''
-                        docker stop ${APP_NAME}-prod || true
-                        docker rm ${APP_NAME}-prod || true
+                    bat '''
+                        docker stop %APP_NAME%-prod || exit 0
+                        docker rm %APP_NAME%-prod || exit 0
                     '''
                     // Run new container
-                    sh '''
-                        docker run -d \
-                            --name ${APP_NAME}-prod \
-                            -p 3000:3000 \
-                            -e NODE_ENV=production \
-                            ${APP_NAME}:${BUILD_NUMBER}
+                    bat '''
+                        docker run -d ^
+                            --name %APP_NAME%-prod ^
+                            -p 3000:3000 ^
+                            -e NODE_ENV=production ^
+                            %APP_NAME%:%BUILD_NUMBER%
                     '''
                 }
             }
