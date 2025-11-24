@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+npm-debug.log
+package-lock.json
+
+# Testing
+coverage
+.nyc_output
+
+# Environment
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+
+# CI/CD
+.jenkins
+Jenkinsfile
+
+# Documentation
+README.md
+*.md
+
+# Tests
+tests
+*.test.js
