@@ -40,6 +40,18 @@ describe('App - Basic Endpoints', () => {
       expect(response.body).toHaveProperty('error', 'Not Found');
     });
   });
+  describe('GET /api/products', () => {
+    it('should return a list of products', async () => {
+      const response = await request(app).get('/api/products');
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      expect(response.body[0]).toHaveProperty('id');
+      expect(response.body[0]).toHaveProperty('name');
+      expect(response.body[0]).toHaveProperty('price');
+    });
+  });
 });
 
 describe('Users API - Unit Tests', () => {

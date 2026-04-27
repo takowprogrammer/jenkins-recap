@@ -20,7 +20,8 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/health',
-      users: '/api/users'
+      users: '/api/users',
+      products: '/api/products'
     }
   });
 });
@@ -34,6 +35,14 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/users', usersRouter);
+
+// New products endpoint
+app.get('/api/products', (req, res) => {
+  res.json([
+    { id: 1, name: 'Laptop', price: 999 },
+    { id: 2, name: 'Smartphone', price: 699 }
+  ]);
+});
 
 // 404 handler
 app.use((req, res) => {
