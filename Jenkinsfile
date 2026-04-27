@@ -43,8 +43,8 @@ pipeline {
             steps {
                 echo 'Building Docker image...'
                 script {
-                    docker.build("${APP_NAME}:${BUILD_NUMBER}")
-                    docker.build("${APP_NAME}:latest")
+                    sh "docker build -t ${APP_NAME}:${BUILD_NUMBER} ."
+                    sh "docker build -t ${APP_NAME}:latest ."
                 }
             }
         }
