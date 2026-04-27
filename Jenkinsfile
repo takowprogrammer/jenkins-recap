@@ -2,12 +2,12 @@ pipeline {
     agent any
     
     environment {
-        NODE_VERSION = '18'
+        NODE_VERSION = '22'
         APP_NAME = 'jenkins-demo-app'
     }
     
     tools {
-        nodejs 'NodeJS 18'
+        nodejs 'NodeJS 22'
     }
     
     stages {
