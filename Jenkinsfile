@@ -17,21 +17,21 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo 'Installing Node.js dependencies...'
-                bat 'npm ci'
+                sh 'npm ci'
             }
         }
         
         stage('Lint') {
             steps {
                 echo 'Running ESLint...'
-                bat 'npm run lint'
+                sh 'npm run lint'
             }
         }
         
         stage('Test') {
             steps {
                 echo 'Running tests with coverage...'
-                bat 'npm test'
+                sh 'npm test'
             }
         }
         
@@ -78,17 +78,17 @@ pipeline {
                 echo 'Deploying to staging environment...'
                 script {
                     // Stop existing container if running
-                    bat '''
-                        docker stop %APP_NAME%-staging || exit 0
-                        docker rm %APP_NAME%-staging || exit 0
+                    sh '''
+                        docker stop ${APP_NAME}-staging || true
+                        docker rm ${APP_NAME}-staging || true
                     '''
                     // Run new container
-                    bat '''
-                        docker run -d ^
-                            --name %APP_NAME%-staging ^
-                            -p 3001:3000 ^
-                            -e NODE_ENV=staging ^
-                            %APP_NAME%:%BUILD_NUMBER%
+                    sh '''
+                        docker run -d \
+                            --name ${APP_NAME}-staging \
+                            -p 3001:3000 \
+                            -e NODE_ENV=staging \
+                            ${APP_NAME}:${BUILD_NUMBER}
                     '''
                 }
             }
@@ -103,17 +103,17 @@ pipeline {
                 input message: 'Deploy to production?', ok: 'Deploy'
                 script {
                     // Stop existing container if running
-                    bat '''
-                        docker stop %APP_NAME%-prod || exit 0
-                        docker rm %APP_NAME%-prod || exit 0
+                    sh '''
+                        docker stop ${APP_NAME}-prod || true
+                        docker rm ${APP_NAME}-prod || true
                     '''
                     // Run new container
-                    bat '''
-                        docker run -d ^
-                            --name %APP_NAME%-prod ^
-                            -p 3000:3000 ^
-                            -e NODE_ENV=production ^
-                            %APP_NAME%:%BUILD_NUMBER%
+                    sh '''
+                        docker run -d \
+                            --name ${APP_NAME}-prod \
+                            -p 3000:3000 \
+                            -e NODE_ENV=production \
+                            ${APP_NAME}:${BUILD_NUMBER}
                     '''
                 }
             }
