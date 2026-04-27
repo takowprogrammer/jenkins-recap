@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 // Routes
 app.get('/', (req, res) => {
   res.json({
-    message: 'Welcome to Jenkins Demo API',
+    message: 'Welcome to Jenkins Demo API Deployment',
     version: '1.0.0',
     endpoints: {
       health: '/health',
