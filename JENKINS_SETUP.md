@@ -24,6 +24,7 @@ This guide will walk you through setting up Jenkins to run the CI/CD pipeline fo
 
 ### Option 1: Docker (Recommended for Demo)
 
+**Linux/macOS:**
 ```bash
 docker run -d \
   --name jenkins \
@@ -33,6 +34,38 @@ docker run -d \
   -v /var/run/docker.sock:/var/run/docker.sock \
   jenkins/jenkins:lts
 ```
+
+**Windows (Git Bash / MINGW64):**
+
+> ⚠️ Git Bash automatically converts Unix-style paths (e.g. `/var/run/...`) to Windows paths, which breaks Docker volume mounts. Use one of these workarounds:
+
+*Option A — Prefix with `MSYS_NO_PATHCONV=1`:*
+```bash
+MSYS_NO_PATHCONV=1 docker run -d \
+  --name jenkins \
+  -p 8080:8080 \
+  -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  jenkins/jenkins:lts
+```
+
+*Option B — Use double slashes to prevent path conversion:*
+```bash
+docker run -d \
+  --name jenkins \
+  -p 8080:8080 \
+  -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home \
+  -v //var/run/docker.sock:/var/run/docker.sock \
+  jenkins/jenkins:lts
+```
+
+> 💡 **Port conflict?** If port `8080` is already in use, map to a different host port (e.g. `9090:8080`):
+> ```bash
+> -p 9090:8080
+> ```
+> Then access Jenkins at `http://localhost:9090` instead.
 
 ### Option 2: Local Installation
 
@@ -55,11 +88,14 @@ Download the installer from [jenkins.io](https://www.jenkins.io/download/)
 
 ### Initial Setup
 
-1. Access Jenkins at `http://localhost:8080`
+1. Access Jenkins at `http://localhost:8080` (or `http://localhost:9090` if you remapped the port)
 2. Retrieve the initial admin password:
    ```bash
-   # Docker
+   # Docker (Linux/macOS)
    docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+   
+   # Docker (Windows Git Bash) — must prevent path conversion
+   MSYS_NO_PATHCONV=1 docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
    
    # Local installation
    cat /var/lib/jenkins/secrets/initialAdminPassword
@@ -126,7 +162,7 @@ ok
 1. Go to your GitHub repository
 2. Navigate to **Settings → Webhooks → Add webhook**
 3. Configure:
-   - Payload URL: `http://<jenkins-url>:8080/github-webhook/`
+   - Payload URL: `http://<jenkins-url>:<port>/github-webhook/` (e.g. port `8080` or `9090`)
    - Content type: `application/json`
    - Events: **Just the push event**
 4. Click **Add webhook**
@@ -136,7 +172,7 @@ ok
 1. Go to your GitLab project
 2. Navigate to **Settings → Webhooks**
 3. Configure:
-   - URL: `http://<jenkins-url>:8080/project/<job-name>`
+   - URL: `http://<jenkins-url>:<port>/project/<job-name>` (e.g. port `8080` or `9090`)
    - Trigger: **Push events**
 4. Click **Add webhook**
 
@@ -275,7 +311,7 @@ sudo chmod 666 /var/run/docker.sock
 1. Check webhook delivery in GitHub/GitLab settings
 2. Verify Jenkins URL is accessible from internet
 3. Check Jenkins logs: **Manage Jenkins → System Log**
-4. Ensure firewall allows incoming connections on port 8080
+4. Ensure firewall allows incoming connections on the Jenkins port (e.g. `8080` or `9090`)
 
 ### Issue: Tests fail in Jenkins but pass locally
 
@@ -284,10 +320,47 @@ sudo chmod 666 /var/run/docker.sock
 2. Verify environment variables are set
 3. Clear npm cache in pipeline:
    ```groovy
-   sh 'npm cache clean --force'
-   sh 'rm -rf node_modules package-lock.json'
-   sh 'npm install'
-   ```
+    sh 'npm cache clean --force'
+    sh 'rm -rf node_modules package-lock.json'
+    sh 'npm install'
+    ```
+
+### Issue: Git Bash converts Docker paths on Windows
+
+**Symptom:**
+```
+error while creating mount source path '/mnt/c/Program Files/Git/var/run/docker.sock;C': permission denied
+```
+
+**Cause:** Git Bash (MINGW64) automatically translates Unix paths to Windows paths.
+
+**Solution:**
+```bash
+# Option A: Disable path conversion for the command
+MSYS_NO_PATHCONV=1 docker run ...
+
+# Option B: Use double slashes to escape
+-v //var/run/docker.sock:/var/run/docker.sock
+```
+
+### Issue: Port already allocated
+
+**Symptom:**
+```
+Bind for 0.0.0.0:9090 failed: port is already allocated
+```
+
+**Solution:**
+```bash
+# 1. Check what's using the port
+netstat -ano | findstr ":9090"
+
+# 2. Either stop the conflicting process, or map Jenkins to a different host port
+docker run -d --name jenkins -p 9090:8080 ...
+
+# 3. If a failed container is lingering, remove it first
+docker rm jenkins
+```
 
 ## 📚 Pipeline Stages Explained
 

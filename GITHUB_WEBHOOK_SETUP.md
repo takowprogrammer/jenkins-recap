@@ -25,7 +25,7 @@ This guide explains how to configure GitHub to automatically trigger your Jenkin
 GitHub needs to reach your Jenkins server to send webhook notifications.
 
 #### Option A: If Jenkins is on a Public Server
-- Your Jenkins URL is already accessible (e.g., `http://jenkins.yourcompany.com:8080`)
+- Your Jenkins URL is already accessible (e.g., `http://jenkins.yourcompany.com:8080` or whichever port Jenkins is mapped to)
 - Skip to Step 3
 
 #### Option B: If Jenkins is Running Locally (Recommended for Demo)
@@ -44,7 +44,8 @@ scoop install ngrok
 
 **Start ngrok tunnel:**
 ```bash
-ngrok http 8080
+# Use the port Jenkins is running on (8080 by default, or 9090 if remapped)
+ngrok http 8080    # or: ngrok http 9090
 ```
 
 **Output will show:**
@@ -86,7 +87,7 @@ https://your-jenkins-url/github-webhook/
 ```
 
 **Examples:**
-- Public server: `http://jenkins.yourcompany.com:8080/github-webhook/`
+- Public server: `http://jenkins.yourcompany.com:<port>/github-webhook/` (e.g. `8080` or `9090`)
 - ngrok: `https://abc123.ngrok.io/github-webhook/`
 - **Important:** Don't forget the trailing slash `/`
 
@@ -326,7 +327,7 @@ http://JENKINS_URL/github-webhook/
 
 ### Common URLs
 - Local with ngrok: `https://abc123.ngrok.io/github-webhook/`
-- Public server: `http://jenkins.example.com:8080/github-webhook/`
+- Public server: `http://jenkins.example.com:<port>/github-webhook/` (e.g. `8080` or `9090`)
 - Multibranch: `http://JENKINS_URL/multibranch-webhook-trigger/invoke?token=TOKEN`
 
 ### GitHub Webhook Settings
