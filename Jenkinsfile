@@ -6,6 +6,10 @@ pipeline {
         APP_NAME = 'jenkins-demo-app'
     }
     
+    tools {
+        nodejs 'NodeJS 18'
+    }
+    
     stages {
         stage('Checkout') {
             steps {
