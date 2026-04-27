@@ -75,9 +75,6 @@ pipeline {
         // }
         
         stage('Deploy to Staging') {
-            when {
-                branch 'develop'
-            }
             steps {
                 echo 'Deploying to staging environment...'
                 script {
@@ -99,9 +96,6 @@ pipeline {
         }
         
         stage('Deploy to Production') {
-            when {
-                branch 'master'
-            }
             steps {
                 echo 'Deploying to production environment...'
                 input message: 'Deploy to production?', ok: 'Deploy'
